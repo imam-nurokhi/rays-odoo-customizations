@@ -1,0 +1,409 @@
+/* ============================================================
+   AR & AP Dashboard — Raysolusi Pialang Asuransi
+   ============================================================ */
+
+.arap-dashboard {
+    background: #f0f4f8;
+    min-height: 100vh;
+    padding: 0;
+    font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+/* ── Header ──────────────────────────────────────────────── */
+.arap-header {
+    background: linear-gradient(135deg, #1a3c5e 0%, #2c5f8a 60%, #3a7ab8 100%);
+    padding: 20px 28px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 4px 20px rgba(26, 60, 94, 0.3);
+}
+.arap-header-left h1 {
+    margin: 0;
+    color: #ffffff;
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+}
+.arap-header-left p {
+    margin: 3px 0 0;
+    color: rgba(255,255,255,0.75);
+    font-size: 12px;
+}
+.arap-header-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.arap-refresh-btn {
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.3);
+    color: #fff;
+    padding: 7px 16px;
+    border-radius: 6px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.arap-refresh-btn:hover {
+    background: rgba(255,255,255,0.25);
+    transform: translateY(-1px);
+}
+.arap-last-updated {
+    color: rgba(255,255,255,0.65);
+    font-size: 11px;
+}
+
+/* ── Loading ─────────────────────────────────────────────── */
+.arap-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 400px;
+    color: #1a3c5e;
+}
+.arap-spinner {
+    width: 48px;
+    height: 48px;
+    border: 4px solid #dde4ed;
+    border-top: 4px solid #2c5f8a;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin-bottom: 16px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Content ─────────────────────────────────────────────── */
+.arap-content {
+    padding: 20px 24px;
+    max-width: 1600px;
+    margin: 0 auto;
+}
+
+/* ── KPI Cards ───────────────────────────────────────────── */
+.arap-kpi-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 20px;
+}
+.arap-kpi-card {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 20px 22px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    transition: transform 0.2s, box-shadow 0.2s;
+    border-left: 4px solid transparent;
+    position: relative;
+    overflow: hidden;
+}
+.arap-kpi-card::after {
+    content: '';
+    position: absolute;
+    top: 0; right: 0;
+    width: 80px; height: 80px;
+    border-radius: 50%;
+    opacity: 0.06;
+    transform: translate(20px, -20px);
+}
+.arap-kpi-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+}
+.arap-kpi-card.ar-total   { border-left-color: #2c5f8a; }
+.arap-kpi-card.ar-total::after { background: #2c5f8a; }
+.arap-kpi-card.ap-total   { border-left-color: #e67e22; }
+.arap-kpi-card.ap-total::after { background: #e67e22; }
+.arap-kpi-card.ar-overdue { border-left-color: #e74c3c; }
+.arap-kpi-card.ar-overdue::after { background: #e74c3c; }
+.arap-kpi-card.net-pos    { border-left-color: #27ae60; }
+.arap-kpi-card.net-pos::after { background: #27ae60; }
+
+.arap-kpi-icon {
+    width: 48px; height: 48px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; flex-shrink: 0;
+}
+.arap-kpi-card.ar-total   .arap-kpi-icon { background: #e8f0f8; color: #2c5f8a; }
+.arap-kpi-card.ap-total   .arap-kpi-icon { background: #fdf0e0; color: #e67e22; }
+.arap-kpi-card.ar-overdue .arap-kpi-icon { background: #fdeaea; color: #e74c3c; }
+.arap-kpi-card.net-pos    .arap-kpi-icon { background: #e8f8ed; color: #27ae60; }
+
+.arap-kpi-body { flex: 1; min-width: 0; }
+.arap-kpi-label {
+    font-size: 11px; color: #888; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;
+}
+.arap-kpi-value {
+    font-size: 20px; font-weight: 700; color: #1a3c5e;
+    line-height: 1.2; white-space: nowrap;
+    overflow: hidden; text-overflow: ellipsis;
+}
+.arap-kpi-badge {
+    display: inline-block; padding: 2px 8px;
+    border-radius: 10px; font-size: 10px; font-weight: 600; margin-top: 4px;
+}
+.badge-blue   { background: #e8f0f8; color: #2c5f8a; }
+.badge-orange { background: #fdf0e0; color: #e67e22; }
+.badge-red    { background: #fdeaea; color: #e74c3c; }
+.badge-green  { background: #e8f8ed; color: #27ae60; }
+
+/* ── Chart Cards ─────────────────────────────────────────── */
+.arap-charts-row {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 16px; margin-bottom: 20px;
+}
+.arap-full-row { margin-bottom: 20px; }
+.arap-chart-card {
+    background: #ffffff; border-radius: 12px;
+    padding: 20px; box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+}
+.arap-chart-title {
+    font-size: 13px; font-weight: 700; color: #1a3c5e;
+    margin: 0 0 4px 0; display: flex; align-items: center; gap: 8px;
+}
+.arap-chart-title .dot {
+    width: 10px; height: 10px; border-radius: 50%;
+    display: inline-block; flex-shrink: 0;
+}
+.dot-blue   { background: #2c5f8a; }
+.dot-orange { background: #e67e22; }
+.dot-green  { background: #27ae60; }
+.arap-chart-subtitle { font-size: 11px; color: #aaa; margin: 0 0 14px 0; }
+.arap-chart-canvas-wrap { position: relative; width: 100%; }
+.h-220 { height: 220px; }
+.h-260 { height: 260px; }
+.h-200 { height: 200px; }
+.arap-chart-canvas-wrap canvas { width: 100% !important; }
+
+/* ── Tables ──────────────────────────────────────────────── */
+.arap-two-tables {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 16px; margin-bottom: 20px;
+}
+.arap-table-card {
+    background: #ffffff; border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.07); overflow: hidden;
+}
+.arap-table-header { padding: 16px 20px 12px; border-bottom: 1px solid #f0f0f0; }
+.arap-table-inner { overflow-x: auto; }
+.arap-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+.arap-table thead th {
+    background: #1a3c5e; color: #fff; font-size: 11px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.4px;
+    padding: 9px 14px; text-align: left; white-space: nowrap;
+}
+.arap-table tbody tr {
+    border-bottom: 1px solid #f4f6f9; transition: background 0.15s;
+}
+.arap-table tbody tr:hover { background: #f8fafc; }
+.arap-table tbody td { padding: 9px 14px; color: #333; vertical-align: middle; }
+.arap-table tbody td.num { text-align: right; font-family: monospace; font-size: 12px; }
+.arap-rank { font-weight: 700; color: #1a3c5e; }
+.arap-bar-inline { display: flex; align-items: center; gap: 8px; }
+.arap-bar-bg {
+    flex: 1; height: 6px; background: #eee;
+    border-radius: 3px; overflow: hidden; min-width: 60px;
+}
+.arap-bar-fill { height: 100%; border-radius: 3px; transition: width 0.6s ease; }
+.fill-blue   { background: linear-gradient(90deg, #2c5f8a, #3a7ab8); }
+.fill-orange { background: linear-gradient(90deg, #e67e22, #f39c12); }
+.fill-red    { background: linear-gradient(90deg, #e74c3c, #f36c5f); }
+
+/* ── Alert ───────────────────────────────────────────────── */
+.arap-alert {
+    background: linear-gradient(135deg, #fff5f5, #fff);
+    border: 1px solid #f5c6c6; border-left: 4px solid #e74c3c;
+    border-radius: 8px; padding: 12px 16px; margin-bottom: 16px;
+    display: flex; align-items: center; gap: 10px;
+    font-size: 12.5px; color: #c0392b;
+}
+
+/* ── Legend ──────────────────────────────────────────────── */
+.arap-legend { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 8px; }
+.arap-legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #666; }
+.arap-legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+
+/* ── Section title ───────────────────────────────────────── */
+.arap-section-title {
+    font-size: 11px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.8px; color: #aaa; margin: 0 0 12px 2px;
+}
+
+/* ── Responsive ──────────────────────────────────────────── */
+@media (max-width: 1200px) {
+    .arap-kpi-row    { grid-template-columns: repeat(2, 1fr); }
+    .arap-charts-row { grid-template-columns: 1fr; }
+    .arap-two-tables { grid-template-columns: 1fr; }
+}
+@media (max-width: 768px) {
+    .arap-kpi-row  { grid-template-columns: 1fr 1fr; }
+    .arap-content  { padding: 12px; }
+}
+
+/* ── Filter Bar ──────────────────────────────────────────── */
+.arap-filter-bar {
+    background: #fff;
+    padding: 12px 24px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 12px;
+    border-bottom: 1px solid #e8ecf0;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+.arap-filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+.arap-filter-partner { flex: 1; min-width: 200px; }
+.arap-filter-label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #888;
+}
+.arap-filter-input {
+    border: 1px solid #dde4ed;
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-size: 12px;
+    color: #333;
+    outline: none;
+    transition: border-color 0.2s;
+    min-width: 130px;
+}
+.arap-filter-input:focus { border-color: #2c5f8a; box-shadow: 0 0 0 2px rgba(44,95,138,0.1); }
+.arap-filter-actions { display: flex; gap: 8px; align-items: flex-end; }
+.arap-btn-apply {
+    background: #2c5f8a;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 7px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.arap-btn-apply:hover { background: #1a3c5e; }
+.arap-btn-reset {
+    background: #f4f6f9;
+    color: #666;
+    border: 1px solid #dde4ed;
+    border-radius: 6px;
+    padding: 7px 12px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.arap-btn-reset:hover { background: #ffe8e8; color: #e74c3c; border-color: #e74c3c; }
+.arap-filter-active-chips {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    align-items: center;
+    width: 100%;
+}
+.arap-chip {
+    background: #e8f0f8;
+    color: #2c5f8a;
+    border-radius: 12px;
+    padding: 3px 10px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+/* ── Modal ───────────────────────────────────────────────── */
+.arap-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    backdrop-filter: blur(2px);
+}
+.arap-modal {
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+    width: 100%;
+    max-width: 1100px;
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    animation: modal-in 0.18s ease;
+}
+@keyframes modal-in {
+    from { opacity: 0; transform: scale(0.96) translateY(10px); }
+    to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+.arap-modal-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid #f0f0f0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #f8fafc;
+}
+.arap-modal-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #1a3c5e;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.arap-modal-close {
+    background: none;
+    border: none;
+    font-size: 16px;
+    color: #aaa;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 6px;
+    transition: all 0.15s;
+}
+.arap-modal-close:hover { background: #ffe8e8; color: #e74c3c; }
+.arap-modal-body { flex: 1; overflow: hidden; display: flex; flex-direction: column; }
+.arap-modal-summary {
+    padding: 10px 20px;
+    background: #f8fafc;
+    border-bottom: 1px solid #f0f0f0;
+    display: flex;
+    gap: 20px;
+    font-size: 12px;
+    color: #666;
+}
+.arap-modal-table-wrap { flex: 1; overflow-y: auto; overflow-x: auto; }
+.arap-modal-table { width: 100%; }
+.arap-modal-table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background: #1a3c5e;
+}
+.arap-modal-table tbody tr.row-overdue td { background: #fff8f8; }
+.arap-modal-table .doc-name { font-weight: 600; font-family: monospace; font-size: 11px; }
+.arap-modal-note {
+    padding: 8px 20px;
+    font-size: 11px;
+    color: #aaa;
+    border-top: 1px solid #f0f0f0;
+    margin: 0;
+}

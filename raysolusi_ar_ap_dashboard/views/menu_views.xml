@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Client Action: AR & AP Dashboard -->
+    <record id="action_ar_ap_dashboard" model="ir.actions.client">
+        <field name="name">AR &amp; AP Dashboard</field>
+        <field name="tag">raysolusi_ar_ap_dashboard</field>
+        <field name="target">main</field>
+    </record>
+
+    <!-- Menu under Accounting > Reporting -->
+    <menuitem
+        id="menu_ar_ap_dashboard"
+        name="AR &amp; AP Dashboard"
+        parent="account.menu_finance_reports"
+        action="action_ar_ap_dashboard"
+        sequence="5"
+    />
+</odoo>

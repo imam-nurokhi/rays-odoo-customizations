@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--
+        AR Dashboard view (standalone list view for drilldown if needed).
+        Primary interaction is via the wizard form in ar_report_wizard.xml.
+    -->
+</odoo>

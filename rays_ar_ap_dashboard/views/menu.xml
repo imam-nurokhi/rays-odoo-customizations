@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- TOP-LEVEL RAYS Reports application menu -->
+    <menuitem id="menu_rays_reports"
+              name="RAYS Reports"
+              web_icon="rays_ar_ap_dashboard,static/description/icon.png"
+              sequence="200"/>
+
+    <!-- Sub-menus under RAYS Reports -->
+    <menuitem id="menu_rays_ar_report"
+              name="AR Report"
+              parent="menu_rays_reports"
+              action="action_rays_ar_report"
+              sequence="10"/>
+
+    <menuitem id="menu_rays_ap_report"
+              name="AP Report"
+              parent="menu_rays_reports"
+              action="action_rays_ap_report"
+              sequence="20"/>
+
+    <menuitem id="menu_rays_laporan_produksi"
+              name="Laporan Produksi"
+              parent="menu_rays_reports"
+              action="rays_production_report.action_rays_production_report"
+              sequence="30"/>
+
+    <menuitem id="menu_rays_dashboard"
+              name="Dashboard"
+              parent="menu_rays_reports"
+              action="raysolusi_ar_ap_dashboard.action_ar_ap_dashboard"
+              sequence="40"/>
+
+    <!-- Shortcut under Accounting > Reporting -->
+</odoo>

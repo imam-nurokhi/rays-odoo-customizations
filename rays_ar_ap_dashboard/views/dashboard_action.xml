@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_rays_dashboard" model="ir.actions.client">
+        <field name="name">RAYS AR/AP Dashboard</field>
+        <field name="tag">rays_ar_ap_dashboard</field>
+        <field name="target">main</field>
+    </record>
+</odoo>

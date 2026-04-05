@@ -1,0 +1,36 @@
+.rays-dashboard {
+    background: #f0f2f5;
+    min-height: 100vh;
+
+    .rays-header {
+        background: linear-gradient(135deg, #1F4E79 0%, #2E86AB 100%);
+        border-bottom: 3px solid #F18F01;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+
+    .rays-date-input {
+        max-width: 150px;
+        border-radius: 6px;
+        border: 1px solid rgba(255,255,255,0.4);
+        background: rgba(255,255,255,0.15);
+        color: white;
+        &::-webkit-calendar-picker-indicator { filter: invert(1); }
+    }
+
+    .rays-kpi-card {
+        border-radius: 12px;
+        overflow: hidden;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        &:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.12) !important;
+        }
+        .card-footer { border-radius: 0; }
+    }
+
+    .rays-chart-container {
+        position: relative;
+        height: 280px;
+        canvas { max-height: 100%; }
+    }
+}

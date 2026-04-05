@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_rays_production_report_form" model="ir.ui.view">
+        <field name="name">rays.production.report.form</field>
+        <field name="model">rays.production.report</field>
+        <field name="arch" type="xml">
+            <form string="Laporan Produksi Asuransi">
+                <sheet>
+                    <group string="Filter Laporan">
+                        <group>
+                            <field name="date_from" />
+                            <field name="date_to" />
+                            <field name="move_type" />
+                        </group>
+                        <group>
+                            <field name="partner_id" />
+                            <field name="asuransi_id" />
+                            <field name="currency_id" />
+                        </group>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_generate_excel"
+                            string="Generate Excel"
+                            type="object"
+                            class="btn-primary"
+                            icon="fa-file-excel-o" />
+                    <button string="Tutup" class="btn-secondary" special="cancel" />
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_rays_production_report" model="ir.actions.act_window">
+        <field name="name">Laporan Produksi</field>
+        <field name="res_model">rays.production.report</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_rays_production_report_form" />
+        <field name="target">new</field>
+    </record>
+
+    <menuitem
+        id="menu_rays_production_report"
+        name="Laporan Produksi"
+        parent="rays_insurance.menu_insurance_brokerage_root"
+        action="action_rays_production_report"
+        sequence="35"
+    />
+
+</odoo>

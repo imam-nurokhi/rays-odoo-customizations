@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+<t t-name="rays_ar_ap_dashboard.RaysDashboard">
+  <div class="rays-dashboard o_action">
+    <div class="rays-header d-flex align-items-center justify-content-between px-4 py-3">
+      <div class="d-flex align-items-center gap-2">
+        <i class="fa fa-chart-bar fa-lg text-white"/>
+        <h4 class="mb-0 text-white fw-bold">RAYS AR/AP Dashboard</h4>
+      </div>
+      <div class="d-flex align-items-center gap-3">
+        <div class="d-flex align-items-center gap-1">
+          <label class="text-white mb-0 small">Dari:</label>
+          <input type="date" class="form-control form-control-sm rays-date-input"
+                 t-model="state.dateFrom" t-on-change="onFilterChange"/>
+        </div>
+        <div class="d-flex align-items-center gap-1">
+          <label class="text-white mb-0 small">Sampai:</label>
+          <input type="date" class="form-control form-control-sm rays-date-input"
+                 t-model="state.dateTo" t-on-change="onFilterChange"/>
+        </div>
+        <button class="btn btn-sm btn-outline-light" t-on-click="onFilterChange">
+          <i class="fa fa-refresh me-1"/>Refresh
+        </button>
+      </div>
+    </div>
+    <t t-if="state.loading">
+      <div class="d-flex flex-column align-items-center justify-content-center" style="min-height:60vh">
+        <i class="fa fa-spinner fa-spin fa-3x text-primary mb-3"/>
+        <p class="text-muted">Memuat data dashboard...</p>
+      </div>
+    </t>
+    <t t-elif="state.error">
+      <div class="alert alert-danger m-4">
+        <i class="fa fa-exclamation-triangle me-2"/>
+        <t t-esc="state.error"/>
+      </div>
+    </t>
+    <t t-else="">
+      <div class="row g-3 px-4 pt-3">
+        <div class="col-xl-3 col-md-6">
+          <div class="card rays-kpi-card border-0 shadow-sm h-100">
+            <div class="card-body text-center py-4">
+              <div class="mb-2" style="color:#1F4E79"><i class="fa fa-arrow-up fa-2x"/></div>
+              <div class="text-muted small mb-1">Total AR Outstanding</div>
+              <div class="h5 fw-bold mb-0" style="color:#1F4E79" t-esc="formatCurrency(state.kpi.total_ar)"/>
+            </div>
+            <div class="card-footer border-0 text-center py-1" style="background:#1F4E79">
+              <small class="text-white">Piutang Belum Terbayar</small>
+            </div>
+          </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+          <div class="card rays-kpi-card border-0 shadow-sm h-100">
+            <div class="card-body text-center py-4">
+              <div class="mb-2" style="color:#A23B72"><i class="fa fa-arrow-down fa-2x"/></div>
+              <div class="text-muted small mb-1">Total AP Outstanding</div>
+              <div class="h5 fw-bold mb-0" style="color:#A23B72" t-esc="formatCurrency(state.kpi.total_ap)"/>
+            </div>
+            <div class="card-footer border-0 text-center py-1" style="background:#A23B72">
+              <small class="text-white">Hutang Belum Terbayar</small>
+            </div>
+          </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+          <div class="card rays-kpi-card border-0 shadow-sm h-100">
+            <div class="card-body text-center py-4">
+              <div class="mb-2" style="color:#2E86AB"><i class="fa fa-balance-scale fa-2x"/></div>
+              <div class="text-muted small mb-1">Net Position (AR - AP)</div>
+              <div class="h5 fw-bold mb-0" style="color:#2E86AB" t-esc="formatCurrency(state.kpi.net_position)"/>
+            </div>
+            <div class="card-footer border-0 text-center py-1" style="background:#2E86AB">
+              <small class="text-white">Posisi Neto</small>
+            </div>
+          </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+          <div class="card rays-kpi-card border-0 shadow-sm h-100">
+            <div class="card-body text-center py-4">
+              <div class="mb-2" style="color:#F18F01"><i class="fa fa-exclamation-circle fa-2x"/></div>
+              <div class="text-muted small mb-1">AR Overdue</div>
+              <div class="h5 fw-bold mb-0" style="color:#F18F01"><t t-esc="state.kpi.overdue_ar_count"/> items</div>
+            </div>
+            <div class="card-footer border-0 text-center py-1" style="background:#F18F01">
+              <small class="text-white">Melewati Jatuh Tempo</small>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row g-3 px-4 mt-1">
+        <div class="col-md-6">
+          <div class="card border-0 shadow-sm p-3">
+            <div class="rays-chart-container"><canvas id="ar-category-chart"/></div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="card border-0 shadow-sm p-3">
+            <div class="rays-chart-container"><canvas id="ap-category-chart"/></div>
+          </div>
+        </div>
+      </div>
+      <div class="row g-3 px-4 mt-1">
+        <div class="col-md-6">
+          <div class="card border-0 shadow-sm p-3">
+            <div class="rays-chart-container"><canvas id="monthly-ar-chart"/></div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="card border-0 shadow-sm p-3">
+            <div class="rays-chart-container"><canvas id="monthly-ap-chart"/></div>
+          </div>
+        </div>
+      </div>
+      <div class="row g-3 px-4 mt-1 mb-4">
+        <div class="col-md-6">
+          <div class="card border-0 shadow-sm p-3">
+            <div class="rays-chart-container" style="height:320px"><canvas id="top-customers-chart"/></div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="card border-0 shadow-sm p-3">
+            <div class="rays-chart-container" style="height:320px"><canvas id="top-insurance-chart"/></div>
+          </div>
+        </div>
+      </div>
+    </t>
+  </div>
+</t>
+</templates>

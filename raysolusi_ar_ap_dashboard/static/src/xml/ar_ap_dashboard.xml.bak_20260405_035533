@@ -1,0 +1,466 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+<t t-name="raysolusi_ar_ap_dashboard.Dashboard">
+    <div class="arap-dashboard">
+
+        <!-- ── Header ─────────────────────────────────────── -->
+        <div class="arap-header">
+            <div class="arap-header-left">
+                <h1>&#128200; AR &amp; AP Dashboard</h1>
+                <p>PT. Raysolusi Pialang Asuransi &#8212; Analisis Piutang &amp; Hutang Real-time</p>
+            </div>
+            <div class="arap-header-right">
+                <span class="arap-last-updated" t-if="state.lastUpdated">
+                    &#128336; Diperbarui: <t t-esc="state.lastUpdated"/>
+                </span>
+                <button class="arap-refresh-btn" t-on-click="loadData">
+                    &#128260; Refresh
+                </button>
+            </div>
+        </div>
+
+        <!-- ── Filter Bar ─────────────────────────────────────────────────── -->
+        <div class="arap-filter-bar">
+            <div class="arap-filter-group">
+                <label class="arap-filter-label">&#128197; Dari</label>
+                <input type="date" class="arap-filter-input"
+                       t-att-value="state.filterDateFrom"
+                       t-on-change="(e) => { state.filterDateFrom = e.target.value; }"/>
+            </div>
+            <div class="arap-filter-group">
+                <label class="arap-filter-label">&#128197; Sampai</label>
+                <input type="date" class="arap-filter-input"
+                       t-att-value="state.filterDateTo"
+                       t-on-change="(e) => { state.filterDateTo = e.target.value; }"/>
+            </div>
+            <div class="arap-filter-group arap-filter-partner">
+                <label class="arap-filter-label">&#128100; Partner</label>
+                <input type="text" class="arap-filter-input" placeholder="Cari partner..."
+                       t-att-value="state.filterPartner"
+                       t-on-input="(e) => { state.filterPartner = e.target.value; }"/>
+            </div>
+            <div class="arap-filter-actions">
+                <button class="arap-btn-apply" t-on-click="applyFilter">&#128269; Terapkan</button>
+                <button class="arap-btn-reset" t-on-click="resetFilter">&#10006; Reset</button>
+            </div>
+            <t t-if="state.filterDateFrom || state.filterDateTo || state.filterPartner">
+                <div class="arap-filter-active-chips">
+                    <span class="arap-chip" t-if="state.filterDateFrom">Dari: <t t-esc="state.filterDateFrom"/></span>
+                    <span class="arap-chip" t-if="state.filterDateTo">Sampai: <t t-esc="state.filterDateTo"/></span>
+                    <span class="arap-chip" t-if="state.filterPartner">Partner: <t t-esc="state.filterPartner"/></span>
+                </div>
+            </t>
+        </div>
+
+        <!-- ── Loading ────────────────────────────────────── -->
+        <div class="arap-loading" t-if="state.loading">
+            <div class="arap-spinner"/>
+            <p>Memuat data dashboard...</p>
+        </div>
+
+        <!-- ── Main Content ───────────────────────────────── -->
+        <div class="arap-content" t-if="!state.loading &amp;&amp; state.data">
+
+            <!-- Overdue Alert -->
+            <t t-if="state.data.summary.overdue_ar_count > 0 || state.data.summary.overdue_ap_count > 0">
+                <div class="arap-alert">
+                    &#9888;&#65039;
+                    <span>
+                        <strong>Perhatian:</strong>
+                        AR jatuh tempo Rp <t t-esc="formatIDR(state.data.summary.overdue_ar)"/>
+                        (<t t-esc="state.data.summary.overdue_ar_count"/> invoice) &#8212;
+                        AP jatuh tempo Rp <t t-esc="formatIDR(state.data.summary.overdue_ap)"/>
+                        (<t t-esc="state.data.summary.overdue_ap_count"/> bill).
+                    </span>
+                </div>
+            </t>
+
+            <!-- ── KPI Cards ──────────────────────────────── -->
+            <p class="arap-section-title">Ringkasan Posisi Keuangan</p>
+            <div class="arap-kpi-row">
+
+                <div class="arap-kpi-card ar-total">
+                    <div class="arap-kpi-icon">&#128184;</div>
+                    <div class="arap-kpi-body">
+                        <div class="arap-kpi-label">Total Piutang (AR)</div>
+                        <div class="arap-kpi-value">Rp <t t-esc="formatIDR(state.data.summary.total_ar)"/></div>
+                        <span class="arap-kpi-badge badge-blue">
+                            <t t-esc="state.data.summary.ar_count"/> invoice outstanding
+                        </span>
+                    </div>
+                </div>
+
+                <div class="arap-kpi-card ap-total">
+                    <div class="arap-kpi-icon">&#128176;</div>
+                    <div class="arap-kpi-body">
+                        <div class="arap-kpi-label">Total Hutang (AP)</div>
+                        <div class="arap-kpi-value">Rp <t t-esc="formatIDR(state.data.summary.total_ap)"/></div>
+                        <span class="arap-kpi-badge badge-orange">
+                            <t t-esc="state.data.summary.ap_count"/> bill outstanding
+                        </span>
+                    </div>
+                </div>
+
+                <div class="arap-kpi-card ar-overdue">
+                    <div class="arap-kpi-icon">&#9203;</div>
+                    <div class="arap-kpi-body">
+                        <div class="arap-kpi-label">AR Overdue</div>
+                        <div class="arap-kpi-value">Rp <t t-esc="formatIDR(state.data.summary.overdue_ar)"/></div>
+                        <span class="arap-kpi-badge badge-red">
+                            <t t-esc="state.data.summary.overdue_ar_count"/> invoice overdue
+                        </span>
+                    </div>
+                </div>
+
+                <div class="arap-kpi-card net-pos">
+                    <div class="arap-kpi-icon">&#9878;&#65039;</div>
+                    <div class="arap-kpi-body">
+                        <div class="arap-kpi-label">Posisi Bersih (AR &#8722; AP)</div>
+                        <div class="arap-kpi-value">Rp <t t-esc="formatIDR(state.data.summary.net_position)"/></div>
+                        <span class="arap-kpi-badge badge-green">Net position</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- ── Aging Charts ───────────────────────────── -->
+            <p class="arap-section-title">Analisis Aging Piutang &amp; Hutang Outstanding</p>
+            <div class="arap-charts-row">
+                <div class="arap-chart-card">
+                    <p class="arap-chart-title">
+                        <span class="dot dot-blue"/>
+                        Aging AR &#8212; Piutang Outstanding
+                    </p>
+                    <p class="arap-chart-subtitle">Distribusi umur piutang yang belum dilunasi</p>
+                    <div class="arap-chart-canvas-wrap h-220">
+                        <canvas t-ref="arAgingChart"/>
+                    </div>
+                </div>
+                <div class="arap-chart-card">
+                    <p class="arap-chart-title">
+                        <span class="dot dot-orange"/>
+                        Aging AP &#8212; Hutang Outstanding
+                    </p>
+                    <p class="arap-chart-subtitle">Distribusi umur hutang yang belum dilunasi</p>
+                    <div class="arap-chart-canvas-wrap h-220">
+                        <canvas t-ref="apAgingChart"/>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Breakdown Kategori -->
+            <p class="arap-section-title">Breakdown Kategori AR &amp; AP</p>
+            <div class="arap-charts-row">
+                <div class="arap-chart-card">
+                    <p class="arap-chart-title">
+                        <span class="dot dot-blue"/>
+                        AR &#8212; Premi vs Diskon
+                    </p>
+                    <p class="arap-chart-subtitle">Piutang berdasarkan kategori invoice &amp; credit note</p>
+                    <div class="arap-chart-canvas-wrap h-220">
+                        <canvas t-ref="arCategoryChart"/>
+                    </div>
+                </div>
+                <div class="arap-chart-card">
+                    <p class="arap-chart-title">
+                        <span class="dot dot-orange"/>
+                        AP &#8212; Premi vs Brokerage
+                    </p>
+                    <p class="arap-chart-subtitle">Hutang berdasarkan kategori bill &amp; brokerage</p>
+                    <div class="arap-chart-canvas-wrap h-220">
+                        <canvas t-ref="apCategoryChart"/>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── Monthly Trend ──────────────────────────── -->
+            <p class="arap-section-title">Trend Bulanan 12 Bulan Terakhir</p>
+            <div class="arap-full-row">
+                <div class="arap-chart-card">
+                    <p class="arap-chart-title">
+                        <span class="dot dot-blue"/>
+                        Trend AR vs AP &#8212; 12 Bulan Terakhir
+                    </p>
+                    <p class="arap-chart-subtitle">Total invoice &amp; bill yang diposting per bulan</p>
+                    <div class="arap-legend">
+                        <div class="arap-legend-item">
+                            <div class="arap-legend-dot" style="background:#2c5f8a;"/>
+                            <span>AR (Piutang)</span>
+                        </div>
+                        <div class="arap-legend-item">
+                            <div class="arap-legend-dot" style="background:#e67e22;"/>
+                            <span>AP (Hutang)</span>
+                        </div>
+                    </div>
+                    <div class="arap-chart-canvas-wrap h-260" style="margin-top:12px;">
+                        <canvas t-ref="monthlyChart"/>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── Top Partners Tables ────────────────────── -->
+            <p class="arap-section-title">Top 10 Debitor &amp; Kreditor</p>
+            <div class="arap-two-tables">
+
+                <div class="arap-table-card">
+                    <div class="arap-table-header">
+                        <p class="arap-chart-title"><span class="dot dot-blue"/> Top 10 Debitor (AR Terbesar)</p>
+                        <p class="arap-chart-subtitle">Partner dengan piutang outstanding terbesar</p>
+                    </div>
+                    <div class="arap-table-inner">
+                        <table class="arap-table">
+                            <thead><tr>
+                                <th>#</th><th>Partner</th><th>Inv</th><th>Outstanding</th><th style="min-width:90px;">Porsi</th>
+                            </tr></thead>
+                            <tbody>
+                                <t t-foreach="state.data.top_ar" t-as="r" t-key="r_index">
+                                    <tr>
+                                        <td><span class="arap-rank"><t t-esc="r_index + 1"/></span></td>
+                                        <td><t t-esc="r.partner"/></td>
+                                        <td class="num"><t t-esc="r.count"/></td>
+                                        <td class="num">Rp <t t-esc="formatIDR(r.amount)"/></td>
+                                        <td>
+                                            <div class="arap-bar-inline">
+                                                <div class="arap-bar-bg">
+                                                    <div class="arap-bar-fill fill-blue"
+                                                         t-attf-style="width:#{getPercent(r.amount, state.data.top_ar)}%;"/>
+                                                </div>
+                                                <span style="font-size:10px;color:#888;min-width:28px;">
+                                                    <t t-esc="getPercent(r.amount, state.data.top_ar)"/>%
+                                                </span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="arap-table-card">
+                    <div class="arap-table-header">
+                        <p class="arap-chart-title"><span class="dot dot-orange"/> Top 10 Kreditor (AP Terbesar)</p>
+                        <p class="arap-chart-subtitle">Partner dengan hutang outstanding terbesar</p>
+                    </div>
+                    <div class="arap-table-inner">
+                        <table class="arap-table">
+                            <thead><tr>
+                                <th>#</th><th>Partner</th><th>Bill</th><th>Outstanding</th><th style="min-width:90px;">Porsi</th>
+                            </tr></thead>
+                            <tbody>
+                                <t t-foreach="state.data.top_ap" t-as="r" t-key="r_index">
+                                    <tr>
+                                        <td><span class="arap-rank"><t t-esc="r_index + 1"/></span></td>
+                                        <td><t t-esc="r.partner"/></td>
+                                        <td class="num"><t t-esc="r.count"/></td>
+                                        <td class="num">Rp <t t-esc="formatIDR(r.amount)"/></td>
+                                        <td>
+                                            <div class="arap-bar-inline">
+                                                <div class="arap-bar-bg">
+                                                    <div class="arap-bar-fill fill-orange"
+                                                         t-attf-style="width:#{getPercent(r.amount, state.data.top_ap)}%;"/>
+                                                </div>
+                                                <span style="font-size:10px;color:#888;min-width:28px;">
+                                                    <t t-esc="getPercent(r.amount, state.data.top_ap)"/>%
+                                                </span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Top 10 Charts (Bar Horizontal) -->
+            <p class="arap-section-title">Top 10 Customer AR &amp; Asuransi AP</p>
+            <div class="arap-charts-row">
+                <div class="arap-chart-card">
+                    <p class="arap-chart-title">
+                        <span class="dot dot-blue"/>
+                        Top 10 Customer AR
+                    </p>
+                    <p class="arap-chart-subtitle">10 customer dengan piutang terbesar</p>
+                    <div class="arap-chart-canvas-wrap h-260">
+                        <canvas t-ref="topCustomersArChart"/>
+                    </div>
+                </div>
+                <div class="arap-chart-card">
+                    <p class="arap-chart-title">
+                        <span class="dot dot-orange"/>
+                        Top 10 Asuransi AP
+                    </p>
+                    <p class="arap-chart-subtitle">10 vendor/asuransi dengan hutang terbesar</p>
+                    <div class="arap-chart-canvas-wrap h-260">
+                        <canvas t-ref="topInsuranceApChart"/>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── Payment Status ─────────────────────────── -->
+            <p class="arap-section-title">Status Pembayaran (12 Bulan Terakhir)</p>
+            <div class="arap-charts-row">
+                <div class="arap-chart-card">
+                    <p class="arap-chart-title"><span class="dot dot-blue"/> Status Pembayaran AR</p>
+                    <p class="arap-chart-subtitle">Proporsi invoice berdasarkan status pembayaran</p>
+                    <div class="arap-chart-canvas-wrap h-200">
+                        <canvas t-ref="arStatusChart"/>
+                    </div>
+                </div>
+                <div class="arap-chart-card">
+                    <p class="arap-chart-title"><span class="dot dot-orange"/> Status Pembayaran AP</p>
+                    <p class="arap-chart-subtitle">Proporsi bill berdasarkan status pembayaran</p>
+                    <div class="arap-chart-canvas-wrap h-200">
+                        <canvas t-ref="apStatusChart"/>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── Overdue Tables ─────────────────────────── -->
+            <p class="arap-section-title">Top Partner Jatuh Tempo</p>
+            <div class="arap-two-tables">
+
+                <div class="arap-table-card">
+                    <div class="arap-table-header">
+                        <p class="arap-chart-title" style="color:#e74c3c;">
+                            <span class="dot" style="background:#e74c3c;"/> Top AR Overdue
+                        </p>
+                        <p class="arap-chart-subtitle">Piutang yang telah melewati tanggal jatuh tempo</p>
+                    </div>
+                    <div class="arap-table-inner">
+                        <table class="arap-table">
+                            <thead><tr>
+                                <th>#</th><th>Partner</th><th>Inv</th><th>Outstanding</th><th>Max Telat</th>
+                            </tr></thead>
+                            <tbody>
+                                <t t-foreach="state.data.top_overdue_ar" t-as="r" t-key="r_index">
+                                    <tr>
+                                        <td><span class="arap-rank"><t t-esc="r_index + 1"/></span></td>
+                                        <td><t t-esc="r.partner"/></td>
+                                        <td class="num"><t t-esc="r.count"/></td>
+                                        <td class="num" style="color:#e74c3c;font-weight:600;">Rp <t t-esc="formatIDR(r.amount)"/></td>
+                                        <td><span class="arap-kpi-badge badge-red"><t t-esc="r.max_days"/> hari</span></td>
+                                    </tr>
+                                </t>
+                                <t t-if="!state.data.top_overdue_ar.length">
+                                    <tr><td colspan="5" style="text-align:center;color:#27ae60;padding:16px;">
+                                        &#10003; Tidak ada AR overdue
+                                    </td></tr>
+                                </t>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="arap-table-card">
+                    <div class="arap-table-header">
+                        <p class="arap-chart-title" style="color:#e67e22;">
+                            <span class="dot" style="background:#e67e22;"/> Top AP Overdue
+                        </p>
+                        <p class="arap-chart-subtitle">Hutang yang telah melewati tanggal jatuh tempo</p>
+                    </div>
+                    <div class="arap-table-inner">
+                        <table class="arap-table">
+                            <thead><tr>
+                                <th>#</th><th>Partner</th><th>Bill</th><th>Outstanding</th><th>Max Telat</th>
+                            </tr></thead>
+                            <tbody>
+                                <t t-foreach="state.data.top_overdue_ap" t-as="r" t-key="r_index">
+                                    <tr>
+                                        <td><span class="arap-rank"><t t-esc="r_index + 1"/></span></td>
+                                        <td><t t-esc="r.partner"/></td>
+                                        <td class="num"><t t-esc="r.count"/></td>
+                                        <td class="num" style="color:#e67e22;font-weight:600;">Rp <t t-esc="formatIDR(r.amount)"/></td>
+                                        <td><span class="arap-kpi-badge badge-orange"><t t-esc="r.max_days"/> hari</span></td>
+                                    </tr>
+                                </t>
+                                <t t-if="!state.data.top_overdue_ap.length">
+                                    <tr><td colspan="5" style="text-align:center;color:#27ae60;padding:16px;">
+                                        &#10003; Tidak ada AP overdue
+                                    </td></tr>
+                                </t>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+
+        </div><!-- /content -->
+
+        <!-- ── Detail Modal ───────────────────────────────────── -->
+        <t t-if="state.modal.open">
+            <div class="arap-modal-overlay" t-on-click="closeModal">
+                <div class="arap-modal" t-on-click.stop="">
+                    <div class="arap-modal-header">
+                        <h3 class="arap-modal-title">&#128203; <t t-esc="state.modal.title"/></h3>
+                        <button class="arap-modal-close" t-on-click="closeModal">&#10006;</button>
+                    </div>
+                    <div class="arap-modal-body">
+                        <div class="arap-loading" t-if="state.modal.loading">
+                            <div class="arap-spinner"/>
+                            <p>Memuat detail...</p>
+                        </div>
+                        <t t-if="!state.modal.loading">
+                            <div class="arap-modal-summary">
+                                <span><strong><t t-esc="state.modal.total_count"/></strong> dokumen</span>
+                                <span>Total Sisa: <strong>Rp <t t-esc="formatIDR(state.modal.total_amount)"/></strong></span>
+                            </div>
+                            <div class="arap-modal-table-wrap">
+                                <table class="arap-table arap-modal-table">
+                                    <thead><tr>
+                                        <th>#</th>
+                                        <th>No. Dokumen</th>
+                                        <th>Partner</th>
+                                        <th>Tgl Invoice</th>
+                                        <th>Jatuh Tempo</th>
+                                        <th class="num">Nominal</th>
+                                        <th class="num">Sisa</th>
+                                        <th>Status</th>
+                                        <th class="num">Hari Telat</th>
+                                    </tr></thead>
+                                    <tbody>
+                                        <t t-foreach="state.modal.records" t-as="rec" t-key="rec.id">
+                                            <tr t-att-class="rec.days_overdue > 0 ? 'row-overdue' : ''">
+                                                <td><span class="arap-rank"><t t-esc="rec_index + 1"/></span></td>
+                                                <td class="doc-name"><t t-esc="rec.name"/></td>
+                                                <td><t t-esc="rec.partner"/></td>
+                                                <td><t t-esc="rec.date"/></td>
+                                                <td><t t-esc="rec.due_date"/></td>
+                                                <td class="num">Rp <t t-esc="formatIDR(rec.amount_total)"/></td>
+                                                <td class="num">Rp <t t-esc="formatIDR(rec.amount_residual)"/></td>
+                                                <td>
+                                                    <span t-att-class="'arap-kpi-badge ' + (rec.payment_state === 'paid' ? 'badge-green' : rec.payment_state === 'not_paid' ? 'badge-red' : rec.payment_state === 'partial' ? 'badge-orange' : 'badge-blue')">
+                                                        <t t-esc="getPaymentStateLabel(rec.payment_state)"/>
+                                                    </span>
+                                                </td>
+                                                <td class="num">
+                                                    <t t-if="rec.days_overdue > 0">
+                                                        <span class="arap-kpi-badge badge-red"><t t-esc="rec.days_overdue"/> hr</span>
+                                                    </t>
+                                                    <t t-else="">-</t>
+                                                </td>
+                                            </tr>
+                                        </t>
+                                        <t t-if="!state.modal.records.length">
+                                            <tr><td colspan="9" style="text-align:center;padding:20px;color:#aaa;">Tidak ada data</td></tr>
+                                        </t>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <t t-if="state.modal.total_count > 200">
+                                <p class="arap-modal-note">&#9432; Menampilkan 200 dari <t t-esc="state.modal.total_count"/> dokumen.</p>
+                            </t>
+                        </t>
+                    </div>
+                </div>
+            </div>
+        </t>
+
+    </div><!-- /dashboard -->
+</t>
+
+</templates>
