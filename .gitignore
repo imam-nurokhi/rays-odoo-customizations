@@ -22,3 +22,4 @@ venv/
 .idea/
 .vscode/
 node_modules/
+*.bak_*
